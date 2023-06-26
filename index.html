@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operations</title>
+    <style>
+        html {
+            background-color: black;
+        }
+
+        body {
+            margin: 0;
+            font-size: 2em;
+        }
+
+        .console * {
+            font-family: monospace;
+        }
+
+        .console {
+            width: 100vw;
+            height: 93vh;
+            display: flex;
+            flex-direction: column;
+            background: #111111;
+        }
+
+        .console-history {
+            flex-grow: 1;
+            box-sizing: border-box;
+            padding: 14px;
+            overflow-y: auto;
+        }
+
+        .console-input-log,
+        .console-output-log {
+            box-sizing: border-box;
+            padding: 3px 6px;
+            font-size: 0.93em;
+        }
+
+
+
+        .console-input-log {
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .console-output-log {
+            color: #00ffcc;
+        }
+
+        .console-input {
+            flex-shrink: 0;
+            box-sizing: border-box;
+            padding: 5px;
+            outline: none;
+            border: none;
+            border-top: 1px solid #333333;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.07);
+            font-size: 0.9em;
+        }
+
+
+
+        .noSelect {
+            user-select: none;
+        }
+
+        #calcNumPad {
+            color: white;
+            background-color: grey;
+        }
+
+        .calculator__keys {
+            background-color: #999;
+            display: grid;
+            grid-gap: 2px;
+            grid-template-columns: repeat(4, 1fr);
+
+        }
+
+        .calculator__keys>* {
+            background-color: #fff;
+            /* padding: 0.5em 1.25em; */
+            position: relative;
+            text-align: center;
+            height: 2.019em;
+            user-select: none;
+            color: black;
+            user-select: none;
+            -webkit-user-select: none;
+            /* Safari */
+            -moz-user-select: none;
+            /* Firefox */
+            -ms-user-select: none;
+            /* IE10+/Edge */
+
+        }
+
+
+
+        .key--operator {
+            background-color: #eee;
+        }
+    </style>
+</head>
+
+<body>
+    <button onclick="dothat('s')" id="myButton" style="position: absolute; top: 0;  margin-top: 20px;right: 0; background-color: #fff; font-size: 33px; border: none;">-S-</button>
+
+    <div class="console">
+        <div class="console-history"></div>
+        <div id="calcNumPad">
+            <div class="calculator__keys">
+                <div onclick="dothat('/')" class="key--operator" data-action="divide">÷</div>
+                <div onclick="dothat('c')">c</div>
+
+
+                <div onclick="dothat(',')">,</div>
+                <div onclick="dothat('delete', true)">del</div>
+                <div onclick="dothat(7)">7</div>
+                <div onclick="dothat(8)">8</div>
+                <div onclick="dothat(9)">9</div>
+
+                <div onclick="dothat('*')" class="key--operator" data-action="multiply">&times;</div>
+
+                <div onclick="dothat(4)">4</div>
+                <div onclick="dothat(5)">5</div>
+                <div onclick="dothat(6)">6</div>
+                <div onclick="dothat('-')" class="key--operator" data-action="subtract">-</div>
+
+                <div onclick="dothat(1)">1</div>
+                <div onclick="dothat(2)">2</div>
+                <div onclick="dothat(3)">3</div>
+
+
+                <div onclick="dothat('+')" class="key--operator" data-action="add">+</div>
+                <div onclick="dothat('.')" data-action="decimal">.</div>
+                <div onclick="dothat(0)">0</div>
+                <div onclick="dothat('v')">v</div>
+                
+                <div onclick="dothat('enter', true)" class="key--equal" data-action="calculate" id="enterB">Enter</div>
+            </div>
+
+        </div>
+        <input id="inOP" class="console-input" type="text" spellcheck="false">
+    </div>
+    <script>
+
+
+        let consoleInput = document.querySelector(".console-input");
+        let historyContainer = document.querySelector(".console-history");
+        let lastResult = "";
+        let arrayTyped = [];
+
+
+        function addResult(inputAsString, output) {
+
+            lastResult = output;
+
+
+            let outputAsString =
+                output instanceof Array ? `[${output.join(", ")}]` : output.toString();
+            let inputLogElement = document.createElement("div");
+            let outputLogElement = document.createElement("div");
+
+            inputLogElement.classList.add("console-input-log");
+            outputLogElement.classList.add("console-output-log");
+
+            inputLogElement.textContent = `${inputAsString}`;
+            if (!isNaN(outputAsString)) {
+                outputAsString = formartNum(outputAsString)
+            }
+            outputLogElement.textContent = outputAsString;
+
+            let greaterThan = document.createElement("span");
+            greaterThan.classList.add("noSelect");
+            greaterThan.innerText = "> ";
+
+            inputLogElement.prepend(greaterThan);
+            historyContainer.append(inputLogElement, outputLogElement);
+        }
+
+        consoleInput.addEventListener("keyup", (e) => {
+
+
+
+            if (e.key === "Enter" && e.key.length !== 0) {
+                submitCal()
+
+            }
+        });
+
+        function formartNum(num) {
+            return new Intl.NumberFormat('en-US').format(num);
+        }
+        consoleInput.value = "";
+
+        // consoleInput.addEventListener("keyup", (e) => {
+        //     keyInOp(e);
+        // });
+
+
+        consoleInput.value = "";
+
+        function dothat(key, special = false) {
+            let inOP = document.getElementById("inOP");
+            let value = document.getElementById("inOP").value;
+            if (!special) {
+                inOP.value += key;
+            } else {
+                if (key === "delete") {
+                    inOP.value = value.slice(0, value.length - 1);
+                } if (key === "enter") {
+                    submitCal()
+                }
+            }
+
+            consoleInput.scrollLeft = consoleInput.scrollWidth;
+        }
+
+        function submitCal() {
+            if (consoleInput.value === "") {
+                return;
+            }
+            let code = consoleInput.value.trim();
+            let normalString = code;
+            code = code.split(",").join("");
+
+
+
+            if (code.toLowerCase() === "c" || code.toLowerCase() === "cc") {
+                let valueToCopy;
+                if (!isNaN(lastResult) && code.toLowerCase() === "c") {
+                    valueToCopy = Math.floor(lastResult);
+                } else {
+                    valueToCopy = lastResult;
+                }
+                let input = document.createElement("input");
+                input.value = valueToCopy;
+                document.body.appendChild(input);
+
+                input.select();
+                document.execCommand("Copy");
+                input.remove();
+
+                consoleInput.value = "";
+                // consoleInput.focus()
+                return;
+
+            } else if (code.toLowerCase() === "v" || code.toLowerCase() === "vv") {
+                if (!isNaN(lastResult) && code.toLowerCase() === "v") {
+                    consoleInput.value = Math.floor(lastResult);
+                } else {
+                    consoleInput.value = lastResult;
+                }
+                // consoleInput.focus()
+                return;
+
+            } else if (normalString[0].toLowerCase() === "s") {
+                let numb = normalString.replace("s", "").replace("S", "");
+
+
+                if (!isNaN(numb)) {
+                    consoleInput.value = arrayTyped[arrayTyped.length - parseInt(numb)];
+                }
+                // consoleInput.focus()
+                return;
+            }
+            try {
+                addResult(normalString, eval(code));
+            } catch (err) {
+                addResult(code, err);
+            }
+            arrayTyped.push(normalString);
+            if(consoleInput.value[consoleInput.value.length-1]!==","){
+                consoleInput.value = "";
+            }else{
+                consoleInput.value = consoleInput.value.slice(0, -1);
+            }
+            
+            historyContainer.scrollTop = historyContainer.scrollHeight;
+        }
+
+       function p(number) {
+            var percentage = prompt("percentage");
+            var div = document.createElement("div");
+            div.classList.add("console-input-log");
+            div.innerText =  "/* " + formartNum(number) + " " + percentage + "% -> " +  formartNum(percentage * number / 100) + " */";
+            historyContainer.append(div);
+       
+            return number + (percentage * number / 100);
+        }
+
+        consoleInput.value = "'hey'";
+        document.getElementById("enterB").click()
+    </script>
+</body>
+
+</html>
