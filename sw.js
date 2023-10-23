@@ -1,11 +1,11 @@
 var APP_PREFIX = 'screenCalulatorapp'     // Identifier for this app (this needs to be consistent across every cache update)
-var VERSION = 'version_01'              // Version of the off-line cache (change this value everytime you want to update cache)
+var VERSION = 'version_03'              // Version of the off-line cache (change this value everytime you want to update cache)
 var CACHE_NAME = APP_PREFIX + VERSION
 var URLS = [    
   'https://j-m-c-b.github.io/screenCalulator',                        // Add URL you want to cache in this list.
 'https://j-m-c-b.github.io/screenCalulator/',                // If you have separate JS/CSS files,
   'https://j-m-c-b.github.io/screenCalulator/index.html',            // add path to those files here
-  'https://j-m-c-b.github.io/screenCalulator/js/vue.global.js',  
+  
 ]
 
 // Respond with cached resources
