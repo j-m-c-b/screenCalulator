@@ -111,6 +111,14 @@
 </head>
 
 <body>
+    <script>
+        // register ServiceWorker, remember to use absolute path!
+        if (navigator.serviceWorker) {
+            navigator.serviceWorker.register('/screenCalulator/sw.js', { scope: '/screenCalulator/' })
+        }
+
+        // --- Application code here ---
+    </script>
     <button onclick="dothat('s')" id="myButton" style="position: absolute; top: 0;  margin-top: 20px;right: 0; background-color: #fff; font-size: 33px; border: none;">-S-</button>
 
     <div class="console">
